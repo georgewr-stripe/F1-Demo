@@ -11,10 +11,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "f1-red": '#e10600',
-        "f1-dark": '#15151e'
-      }
+        "f1-red": "#e10600",
+        "f1-dark": "#15151e",
+      },
     },
   },
-  plugins: [],
-}
+  plugins: [require("@tailwindcss/forms")],
+};
