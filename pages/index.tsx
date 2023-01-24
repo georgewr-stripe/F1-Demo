@@ -9,6 +9,7 @@ import Footer from "@/lib/footer";
 import Checkout from "@/lib/checkout";
 import { GetServerSideProps } from "next";
 import CompleteSubscription from "@/lib/complete_subscription";
+import usePersistedState from "@/lib/persistantState";
 
 const stripe = new Stripe(process.env.STRIPE_SK || "", {
   apiVersion: "2022-11-15",
@@ -57,7 +58,7 @@ export default function Home({ prices, payment_method }: Props) {
     setSection([sectionName, props]);
   };
 
-  const [checkoutData, setCheckoutData] = React.useState<checkoutDataType>({
+  const [checkoutData, setCheckoutData] = usePersistedState<checkoutDataType>('checkout_data', {
     customer: "",
     price: prices.monthly.id,
     amount: prices.monthly.unit_amount || 0,
