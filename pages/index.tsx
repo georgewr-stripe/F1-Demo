@@ -19,10 +19,10 @@ interface Props {
     monthly: Stripe.Response<Stripe.Price>;
     annual: Stripe.Response<Stripe.Price>;
   };
-  subscription?: string;
+  payment_method?: any;
 }
 
-export default function Home({ prices, subscription }: Props) {
+export default function Home({ prices, payment_method }: Props) {
   const router = useRouter();
 
   const sections = {
@@ -31,7 +31,7 @@ export default function Home({ prices, subscription }: Props) {
     checkout: { component: Checkout, props: {} },
     complete_subscription: {
       component: CompleteSubscription,
-      props: { subscription },
+      props: { payment_method },
     },
   };
   const [section, setSection] = React.useState<[string, any]>(["pricing", {}]);
@@ -64,7 +64,6 @@ export default function Home({ prices, subscription }: Props) {
     currency: "GBP",
     freq: "monthly",
     client_secret: "",
-    subscription,
   });
 
   React.useEffect(() => {
@@ -113,7 +112,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     { expand: ["currency_options"] }
   );
 
-  let subscription = null;
+  let payment_method = null;
 
   if (
     typeof context.query.payment_intent == "string" &&
@@ -124,6 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       context.query.payment_intent,
       { expand: ["payment_method", "latest_charge"] }
     );
+
     if (
       typeof pi.customer == "string" &&
       typeof pi.payment_method != "string" &&
@@ -161,11 +161,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         payment_behavior: "allow_incomplete",
         collection_method: "charge_automatically",
       });
-      subscription = sub.id;
+
+      payment_method = await stripe.paymentMethods.retrieve(pm);
     }
   }
 
   return {
-    props: { prices: { monthly, annual }, subscription },
+    props: { prices: { monthly, annual }, payment_method },
   };
 };

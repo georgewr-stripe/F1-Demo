@@ -23,13 +23,11 @@ const Checkout = ({ checkoutData, setCheckoutData }: Props) => {
     [checkoutData]
   );
 
-  console.log(checkoutData)
+  if (!checkoutData.client_secret) {
+    return <></>
+  }
 
   const options = { clientSecret: checkoutData.client_secret };
-
-  if (!stripePromise || !checkoutData.client_secret) {
-    return <></>;
-  }
 
   return (
     <Elements stripe={stripePromise} options={options}>
@@ -67,7 +65,7 @@ const Checkout = ({ checkoutData, setCheckoutData }: Props) => {
                       <div className="flex-1 border-t-2 border-gray-200" />
                     </div>
                     <p className="text-sm mt-2">
-                      By clicking on register, I agree that I have read and
+                      By purchasing, I agree that I have read and
                       agree to the Terms and Conditions and Privacy Policy
                     </p>
                   </div>
@@ -87,7 +85,7 @@ const Checkout = ({ checkoutData, setCheckoutData }: Props) => {
                     </span>
                   </div>
                   <p className="pt-2">
-                    {checkoutData.freq.toLocaleUpperCase()}
+                    {checkoutData.freq == 'monthly' ? '/MONTH' : '/YEAR'}
                   </p>
                 </div>
               </div>
