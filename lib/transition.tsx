@@ -4,12 +4,13 @@ import { Transition } from "@headlessui/react";
 const SectionTransition = ({
   show,
   children,
+  className
 }: {
   show: boolean;
   children: any;
+  className?: string
 }) => {
   return (
-    <div className="bg-darkGreen">
       <Transition
         show={show}
         enter="transition-opacity duration-500"
@@ -18,10 +19,10 @@ const SectionTransition = ({
         leave="transition-opacity duration-1000"
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
+        className={className}
       >
         {children}
       </Transition>
-    </div>
   );
 };
 
