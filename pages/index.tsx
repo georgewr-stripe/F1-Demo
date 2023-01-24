@@ -48,12 +48,11 @@ export default function Home({ prices, payment_method }: Props) {
         }
       }
     } else {
-      if (section[0] != 'pricing') {
-        setSection(['pricing', {}])
+      if (section[0] != "pricing") {
+        setSection(["pricing", {}]);
       }
     }
   }, [section, router.query, router.asPath]);
-
 
   const handleSectionChange = (
     sectionName: keyof typeof sections,
@@ -63,14 +62,17 @@ export default function Home({ prices, payment_method }: Props) {
     setSection([sectionName, props]);
   };
 
-  const [checkoutData, setCheckoutData] = usePersistedState<checkoutDataType>('checkout_data', {
-    customer: "",
-    price: prices.monthly.id,
-    amount: prices.monthly.unit_amount || 0,
-    currency: "GBP",
-    freq: "monthly",
-    client_secret: "",
-  });
+  const [checkoutData, setCheckoutData] = usePersistedState<checkoutDataType>(
+    "checkout_data",
+    {
+      customer: "",
+      price: prices.monthly.id,
+      amount: prices.monthly.unit_amount || 0,
+      currency: "GBP",
+      freq: "monthly",
+      client_secret: "",
+    }
+  );
 
   React.useEffect(() => {
     console.log(checkoutData);
@@ -82,7 +84,7 @@ export default function Home({ prices, payment_method }: Props) {
         <SectionTransition
           key={key}
           show={section[0] == key}
-          className="absolute w-full"
+          className=" w-full"
         >
           <Section.component
             setSection={handleSectionChange}
@@ -99,11 +101,12 @@ export default function Home({ prices, payment_method }: Props) {
   }, [section, checkoutData]);
 
   return (
-    <div className=" w-screen flex-1 flex-grow-0 min-h-[50%] bg-cover bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col">
-      <div className="pt-20 z-30">{sectionContent}</div>
-      <div className="w-full h-[50%] bg-f1-dark fixed  bottom-0  bg-gradient-to-b from-f1-red to-f1-dark z-0">
-        <Footer />
+    <div className=" w-screen flex-1 flex-grow-0 min-h-[50%] bg-contain bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col">
+      <div className="pt-20 z-30 min-h-[10%]">
+        {sectionContent}
       </div>
+      <div className="w-full bg-f1-dark  bottom-0  bg-gradient-to-b from-f1-red to-f1-dark"></div>
+        <Footer />
     </div>
   );
 }
