@@ -4,10 +4,14 @@ function usePersistedState<S>(
   key: string,
   initialState: S | (() => S)
 ): [S, Dispatch<SetStateAction<S>>] {
-  const saved =
-    typeof window !== "undefined" ? localStorage.getItem(key) : null;
-  const initial = saved ? JSON.parse(saved) : initialState;
-  const [state, setState] = useState(initial);
+  
+  const [state, setState] = useState(initialState);
+  useEffect(() => {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+        setState(JSON.parse(saved))
+    }
+  }, [key])
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(state));
   }, [key, state]);

@@ -47,8 +47,13 @@ export default function Home({ prices, payment_method }: Props) {
           setSection([router.query.section, {}]);
         }
       }
+    } else {
+      if (section[0] != 'pricing') {
+        setSection(['pricing', {}])
+      }
     }
   }, [section, router.query, router.asPath]);
+
 
   const handleSectionChange = (
     sectionName: keyof typeof sections,
