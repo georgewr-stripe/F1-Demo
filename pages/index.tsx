@@ -102,11 +102,9 @@ export default function Home({ prices, payment_method }: Props) {
 
   return (
     <div className=" w-screen flex-1 flex-grow-0 min-h-[50%] bg-contain bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col">
-      <div className="pt-20 z-30 min-h-[10%]">
-        {sectionContent}
-      </div>
+      <div className="pt-20 z-30 min-h-[10%]">{sectionContent}</div>
       <div className="w-full bg-f1-dark  bottom-0  bg-gradient-to-b from-f1-red to-f1-dark"></div>
-        <Footer />
+      <Footer />
     </div>
   );
 }
@@ -138,40 +136,49 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       typeof pi.payment_method != "string" &&
       pi.payment_method
     ) {
-      let pm: any = pi.payment_method.id;
-      if (
-        pi.payment_method.type == "ideal" &&
-        typeof pi.latest_charge != "string"
-      ) {
-        console.log(pi.latest_charge?.payment_method_details);
-        pm =
-          pi.latest_charge?.payment_method_details?.ideal?.generated_sepa_debit;
-      }
-      if (
-        pi.payment_method.type == "bancontact" &&
-        typeof pi.latest_charge != "string"
-      ) {
-        console.log(pi.latest_charge?.payment_method_details);
-        pm =
-          pi.latest_charge?.payment_method_details?.bancontact
-            ?.generated_sepa_debit;
-      }
-
-      const sub = await stripe.subscriptions.create({
+      // Check for existing subscriptions
+      const subscriptions = await stripe.subscriptions.list({
         customer: pi.customer,
-        currency: pi.currency,
-        description: "F1 TV Pro",
-        default_payment_method: pm,
-        items: [
-          {
-            price: pi.metadata.price,
-          },
-        ],
-        payment_behavior: "allow_incomplete",
-        collection_method: "charge_automatically",
+        limit: 1,
       });
 
-      payment_method = await stripe.paymentMethods.retrieve(pm);
+      if (!subscriptions.data.length) {
+        let pm: any = pi.payment_method.id;
+        if (
+          pi.payment_method.type == "ideal" &&
+          typeof pi.latest_charge != "string"
+        ) {
+          console.log(pi.latest_charge?.payment_method_details);
+          pm =
+            pi.latest_charge?.payment_method_details?.ideal
+              ?.generated_sepa_debit;
+        }
+        if (
+          pi.payment_method.type == "bancontact" &&
+          typeof pi.latest_charge != "string"
+        ) {
+          console.log(pi.latest_charge?.payment_method_details);
+          pm =
+            pi.latest_charge?.payment_method_details?.bancontact
+              ?.generated_sepa_debit;
+        }
+
+        const sub = await stripe.subscriptions.create({
+          customer: pi.customer,
+          currency: pi.currency,
+          description: "F1 TV Pro",
+          default_payment_method: pm,
+          items: [
+            {
+              price: pi.metadata.price,
+            },
+          ],
+          payment_behavior: "allow_incomplete",
+          collection_method: "charge_automatically",
+        });
+
+        payment_method = await stripe.paymentMethods.retrieve(pm);
+      }
     }
   }
 
