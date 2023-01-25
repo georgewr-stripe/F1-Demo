@@ -32,10 +32,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className={`bg-white h-full ` + f1Fonts.className}>
-        <div className="relative overflow-hidden">
+      <div className={` h-full bg-f1-red ` + f1Fonts.className}>
+        <div className="relative overflow-hidden min-h-screen">
           <ToolbarSection />
-          <main className="min-h-screen" >
+          <main className="h-full" >
             <Component {...pageProps} />
           </main>
         </div>
