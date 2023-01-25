@@ -84,7 +84,7 @@ export default function Home({ prices, payment_method }: Props) {
         <SectionTransition
           key={key}
           show={section[0] == key}
-          className="w-full"
+          className="top-48 bottom-12 m-auto absolute w-full z-30 flex-1"
         >
           <Section.component
             setSection={handleSectionChange}
@@ -101,11 +101,12 @@ export default function Home({ prices, payment_method }: Props) {
   }, [section, checkoutData]);
 
   return (
-    <div className="w-full h-full">
-      <div className=" w-screen flex-1 flex-grow-0 min-h-[50vh] bg-contain 2xl:bg-cover bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col bg-white">
-        <div className="pt-20 absolute w-full z-30 h-full max-h-[75vh]">{sectionContent}</div>
+    <div className="">
+      <div className="absolute w-full flex-1 flex-grow-0 min-h-[45vh] bg-cover bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col bg-white"></div>
+      <div className="">
+        {sectionContent}
       </div>
-      <div className="min-h-[40%]"><Footer /></div>
+      <Footer className="w-full h-18 fixed bottom-0 z-60"/>
     </div>
   );
 }

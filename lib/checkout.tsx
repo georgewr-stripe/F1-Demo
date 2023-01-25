@@ -31,7 +31,7 @@ const Checkout = ({ checkoutData, setCheckoutData }: Props) => {
 
   return (
     <Elements stripe={stripePromise} options={options}>
-      <div className="bg-transparent z-50">
+      <div className="bg-transparent pb-16">
         <div className="pt-12 sm:pb-12 sm:pt-16 lg:pt-20 bg-gradient-to-b from-gray-50/0 via-gray-100/80 to-gray-100">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="text-center">

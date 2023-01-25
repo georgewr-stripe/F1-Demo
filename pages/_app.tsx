@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <div className={` h-full bg-f1-red ` + f1Fonts.className}>
-        <div className="relative overflow-hidden min-h-screen">
+        <div className="overflow-x-hidden min-h-screen">
           <ToolbarSection />
           <main className="h-full" >
             <Component {...pageProps} />
