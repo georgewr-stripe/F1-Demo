@@ -1,54 +1,28 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  NextApiResponseWithSocket,
-  paymentEvent,
-  ServerToClientEvents,
-  SocketData,
-} from "@/lib/types";
+import { NextApiResponseWithSocket, paymentEvent } from "@/lib/types";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Server } from "socket.io";
-import Stripe from "stripe";
-import { idText } from "typescript";
 
-const stripe = new Stripe(process.env.STRIPE_SK || "", {
-  apiVersion: "2022-11-15",
+import Pusher from "pusher";
+
+export const pusher = new Pusher({
+  appId: "1543747",
+  key: "129700f9ec517f2e7601",
+  secret: "5aabf0962d9287e8de8e",
+  cluster: "eu",
+  useTLS: true,
 });
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseWithSocket
 ) {
-  if (res.socket.server.io) {
-    // send some data
-
-    if (req.body) {
-      const evt = parseWebhook(req);
-      if (evt) {
-        res.socket.server.io.emit("event", evt);
-      }
+  if (req.body) {
+    const evt = parseWebhook(req);
+    if (evt) {
+      pusher.trigger("f1-demo", "event", evt);
     }
-  } else {
-    console.log("Socket is initializing");
-
-    const io = new Server<
-      ClientToServerEvents,
-      ServerToClientEvents,
-      InterServerEvents,
-      SocketData
-    >(res.socket.server);
-
-    res.socket.server.io = io;
-
-    io.on("connection", (socket) => {
-      console.log("connected");
-      socket.on("getEvents", async () => {
-        console.log("getting initial events");
-        io.emit("initialEvents", await getLatestPayments());
-      });
-    });
   }
+
   res.end();
 }
 
@@ -69,18 +43,4 @@ const parseWebhook = (req: NextApiRequest): paymentEvent | null => {
     }
   }
   return null;
-};
-
-const getLatestPayments = async (): Promise<paymentEvent[]> => {
-  const payments = await stripe.paymentIntents.list();
-  return payments.data.map((pi) => {
-    return {
-      id: pi.id,
-      amount: pi.amount,
-      currency: pi.currency,
-      status: pi.status,
-      created: pi.created,
-      payment_error: !!pi.last_payment_error,
-    };
-  });
 };

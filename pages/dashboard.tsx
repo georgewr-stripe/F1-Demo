@@ -7,12 +7,16 @@ import {
 } from "@/lib/types";
 import moment from "moment";
 import React from "react";
-import { io, Socket } from "socket.io-client";
-
-let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+import pusherJs from "pusher-js";
 
 const Dashboard = () => {
   const [events, setEvents] = usePersistedState<paymentEvents>("wh_events", {});
+
+  var pusher = new pusherJs("129700f9ec517f2e7601", {
+    cluster: "eu",
+  });
+
+  var channel = pusher.subscribe("f1-demo");
 
   const totals = React.useMemo(() => {
     const eventData = Object.values(events);
@@ -31,36 +35,24 @@ const Dashboard = () => {
   }, [events]);
 
   React.useEffect(() => {
-    socketInitializer();
+    fetch("/api/get_payments").then((resp) =>
+      resp.json().then((data) => {
+        setEvents(
+          Object.fromEntries(
+            data.map((e: paymentEvent) => {
+              const { id, ...data } = e;
+              return [id, data];
+            })
+          )
+        );
+      })
+    );
   }, []);
 
-  const socketInitializer = async () => {
-    await fetch("/api/socket");
-    socket = io();
-
-    socket.on("connect", () => {
-      console.log("connected");
-      socket.emit("getEvents");
-    });
-
-    socket.on("event", (ev) => {
-        console.log(ev)
-      const { id, ...data } = ev;
-      setEvents((prevEvents) => ({ ...prevEvents, [id]: data }));
-    });
-
-    socket.on("initialEvents", (ev) => {
-        console.log(ev)
-      setEvents(
-        Object.fromEntries(
-          ev.map((e) => {
-            const { id, ...data } = e;
-            return [id, data];
-          })
-        )
-      );
-    });
-  };
+  channel.bind("event", function (ev: paymentEvent) {
+    const { id, ...data } = ev;
+    setEvents((prevEvents) => ({ ...prevEvents, [id]: data }));
+  });
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat("en-GB", {
@@ -82,13 +74,15 @@ const Dashboard = () => {
       Failed: "f1-red",
     };
     const dot = {
-        Succeeded: 'text-green-600',
-        Pending: 'text-amber-600 animate-ping',
-        Failed: 'text-red-600'
-    }
+      Succeeded: "text-green-600",
+      Pending: "text-amber-600 animate-ping",
+      Failed: "text-red-600",
+    };
     return (
-      <span className={`inline-flex items-center rounded-full bg-${colours[status]} px-3 py-0.5 text-sm font-medium text-f1-dark`}>
-       <svg
+      <span
+        className={`inline-flex items-center rounded-full bg-${colours[status]} px-3 py-0.5 text-sm font-medium text-f1-dark`}
+      >
+        <svg
           className={`-ml-1 mr-1.5 h-2 w-2 ${dot[status]}`}
           fill="currentColor"
           viewBox="0 0 8 8"
@@ -103,9 +97,11 @@ const Dashboard = () => {
   return (
     <div className="">
       <div className="mx-auto px-6">
-        <dl className={`mt-5 grid grid-cols-1 lg:grid-cols-${Object.keys(totals).length} divide-y divide-gray-200 overflow-hidden rounded-lg bg-f1-dark shadow  md:divide-y-0 md:divide-x`}>
+        <dl
+          className={`mt-5 flex flex-row justify-evenly overflow-hidden rounded-lg bg-f1-dark shadow `}
+        >
           {Object.entries(totals).map(([currency, amount], i) => (
-            <div key={i} className="px-4 py-5 sm:p-6 justify-items-center">
+            <div key={i} className="px-4 py-5 sm:p-6 ">
               <dt className="text-base font-normal text-white">
                 {currency.toUpperCase()}
               </dt>
