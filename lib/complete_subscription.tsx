@@ -3,6 +3,7 @@ import Spinner from "./spinner";
 import { CheckoutDataType, checkoutDataType } from "./types";
 import Image from "next/image";
 import hamilton from "../public/hamilton.png";
+import moment from "moment";
 
 interface Props {
   checkoutData: checkoutDataType;
@@ -18,14 +19,26 @@ const CompleteSubscription = ({
   console.log(payment_method);
 
   const billingPortal = async () => {
-    const req = await fetch('/api/billing_portal', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({customer: payment_method.customer, return_url: window.location.origin})
-    })
-    const {url} = await req.json()
+    const req = await fetch("/api/billing_portal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customer: payment_method.customer,
+        return_url: window.location.origin,
+      }),
+    });
+    const { url } = await req.json();
     window.location.href = url;
-  }
+  };
+
+  const formatter = React.useMemo(
+    () =>
+      new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: checkoutData.currency,
+      }),
+    [checkoutData]
+  );
 
   return (
     <div className="bg-transparent z-50">
@@ -50,9 +63,9 @@ const CompleteSubscription = ({
                 </h3>
                 <div className="mt-2"></div>
                 <div className="mt-2">
-                  <div className="rounded-md shadow">
+                  <div className="rounded-md shadow mt-6">
                     <button
-                    onClick={billingPortal}
+                      onClick={billingPortal}
                       className="flex w-full items-center justify-center rounded-md border border-transparent bg-f1-dark px-5 py-3 text-base font-medium text-white hover:bg-f1-red"
                     >
                       Configure Subscription
@@ -62,14 +75,27 @@ const CompleteSubscription = ({
                 <div className="mt-8">
                   <div className="flex items-center">
                     <h4 className="flex-shrink-0 bg-white pr-4 text-base font-semibold text-f1-dark">
-                      {"Policies"}
+                      {"Details"}
                     </h4>
                     <div className="flex-1 border-t-2 border-gray-200" />
                   </div>
-                  <p className="text-sm mt-2">
-                    By clicking on register, I agree that I have read and agree
-                    to the Terms and Conditions and Privacy Policy
-                  </p>
+                  <ul className="list-disc">
+                    <li className="text-sm mt-2">F1 TV Pro Subscription</li>
+                    <li className="text-sm mt-2">
+                      Amount:{" "}
+                      {checkoutData.amount
+                        ? formatter.format(checkoutData.amount / 100)
+                        : ""}
+                      {checkoutData.freq == "annual" ? "/year" : "/month"}
+                    </li>
+                    <li className="text-sm mt-2">
+                      Next Payment:{" "}
+                      {moment().add(
+                        checkoutData.freq == "annual" ? 1 : 30,
+                        checkoutData.freq == "annual" ? "year" : "days"
+                      ).format('LL')}
+                    </li>
+                  </ul>
                 </div>
               </div>
               <div className="bg-gray-50 pt-8  text-center lg:flex lg:flex-shrink-0 lg:flex-col lg:justify-center">

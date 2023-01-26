@@ -29,6 +29,7 @@ export default async function handler(
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
       expand: ["latest_invoice.payment_intent"],
+      trial_period_days: 30
     });
 
     res.send({
