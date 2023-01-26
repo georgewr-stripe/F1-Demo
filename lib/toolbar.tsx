@@ -54,10 +54,10 @@ const ToolbarSection = () => {
                 <div className="hidden md:flex md:items-center md:space-x-6">
 
                     <a
-                        href="#"
+                        href="/dashboard"
                         className="inline-flex items-center rounded-md border border-transparent bg-darkGreen px-4 py-2 text-base font-medium text-white hover:bg-gray-700"
                     >
-                        My Account
+                        Dashboard
                     </a>
                 </div>
             </nav>
