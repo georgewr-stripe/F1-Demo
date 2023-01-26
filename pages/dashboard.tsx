@@ -9,12 +9,12 @@ import moment from "moment";
 import React from "react";
 import pusherJs from "pusher-js";
 
-const Dashboard = () => {
-  const [events, setEvents] = usePersistedState<paymentEvents>("wh_events", {});
-
-  var pusher = new pusherJs("129700f9ec517f2e7601", {
+var pusher = new pusherJs("129700f9ec517f2e7601", {
     cluster: "eu",
   });
+
+const Dashboard = () => {
+  const [events, setEvents] = usePersistedState<paymentEvents>("wh_events", {});
 
   var channel = pusher.subscribe("f1-demo");
 
