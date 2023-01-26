@@ -9,7 +9,7 @@ import moment from "moment";
 import React from "react";
 import pusherJs from "pusher-js";
 
-var pusher = new pusherJs("129700f9ec517f2e7601", {
+var pusher = new pusherJs(process.env.NEXT_PUBLIC_PUSHER_KEY || '', {
     cluster: "eu",
   });
 

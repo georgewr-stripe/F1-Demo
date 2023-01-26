@@ -5,9 +5,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Pusher from "pusher";
 
 export const pusher = new Pusher({
-  appId: "1543747",
-  key: "129700f9ec517f2e7601",
-  secret: "5aabf0962d9287e8de8e",
+  appId: process.env.PUSHER_APP_ID || '',
+  key: process.env.NEXT_PUBLIC_PUSHER_KEY || '',
+  secret: process.env.PUSHER_SECRET || '',
   cluster: "eu",
   useTLS: true,
 });
