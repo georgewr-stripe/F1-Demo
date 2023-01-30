@@ -26,7 +26,8 @@ const Register = ({
         name,
         email,
         price: checkoutData.price,
-        currency: checkoutData.currency
+        currency: checkoutData.currency,
+        freq: checkoutData.freq
       }),
       headers: { "Content-Type": "application/json" },
     });

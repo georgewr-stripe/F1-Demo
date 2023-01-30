@@ -12,7 +12,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   
-  const {name, email, price, currency} =  req.body;
+  const {name, email, price, currency, freq} =  req.body;
 
   const customer = await stripe.customers.create({ name, email,});
   const priceObj = await stripe.prices.retrieve(price, {expand: ['currency_options']})
@@ -22,6 +22,8 @@ export default async function handler(
     customer: customer.id,
     metadata: {
       product: 'F1 TV Pro',
+      fan_id: '123',
+      subscription_freq:freq, 
       price: price
     },
     setup_future_usage: 'off_session',

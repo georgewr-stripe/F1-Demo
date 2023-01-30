@@ -177,7 +177,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           ],
           payment_behavior: "allow_incomplete",
           collection_method: "charge_automatically",
-          trial_period_days: 30
+          trial_period_days: 30,
+          metadata: {
+            fan_id: '123',
+            internal_ref: '#4567'
+          }
         });
 
         payment_method = await stripe.paymentMethods.retrieve(pm);
