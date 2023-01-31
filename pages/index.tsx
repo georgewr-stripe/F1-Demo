@@ -103,10 +103,8 @@ export default function Home({ prices, payment_method }: Props) {
   return (
     <div className="">
       <div className="absolute w-full flex-1 flex-grow-0 min-h-[45vh] bg-cover bg-no-repeat bg-top bg-[url(/verstappen.jpeg)] flex flex-col bg-white"></div>
-      <div className="">
-        {sectionContent}
-      </div>
-      <Footer className="w-full h-18 fixed bottom-0 z-60"/>
+      <div className="">{sectionContent}</div>
+      <Footer className="w-full h-18 fixed bottom-0 z-60" />
     </div>
   );
 }
@@ -165,23 +163,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               ?.generated_sepa_debit;
         }
 
-        const sub = await stripe.subscriptions.create({
+        // add the default payment method
+        await stripe.customers.update(pi.customer, {
+          invoice_settings: { default_payment_method: pm },
+        });
+
+        // Create a billing schedule
+        const schedule = await stripe.subscriptionSchedules.create({
           customer: pi.customer,
-          currency: pi.currency,
-          description: "F1 TV Pro",
-          default_payment_method: pm,
-          items: [
+          start_date: Math.floor(
+            new Date(new Date().setDate(new Date().getDate() + 30)).getTime() /
+              1000
+          ),
+          phases: [
             {
-              price: pi.metadata.price,
+              items: [{ price: pi.metadata.price, quantity: 1 }],
+              currency: pi.currency.toLowerCase(),
+              default_payment_method: pm,
             },
           ],
-          payment_behavior: "allow_incomplete",
-          collection_method: "charge_automatically",
-          trial_period_days: 30,
           metadata: {
-            fan_id: '123',
-            internal_ref: '#4567'
-          }
+            fan_id: "123",
+            internal_ref: "#4567",
+          },
+          expand: ["subscription"],
         });
 
         payment_method = await stripe.paymentMethods.retrieve(pm);
